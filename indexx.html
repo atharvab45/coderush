@@ -1,0 +1,2111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CodeRush - Train Like an Athlete</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=JetBrains+Mono:wght@400;700&display=swap');
+        
+        body {
+            background-color: #030305;
+            color: #f1f5f9;
+            font-family: 'Orbitron', sans-serif;
+            overflow-x: hidden;
+            line-height: 1.6;
+        }
+
+        .cyber-glow {
+            text-shadow: 0 0 10px rgba(0, 242, 255, 0.5), 0 0 20px rgba(0, 242, 255, 0.3);
+        }
+
+        .cyber-glow-purple {
+            text-shadow: 0 0 10px rgba(112, 0, 255, 0.5), 0 0 20px rgba(112, 0, 255, 0.3);
+        }
+
+        .neon-border {
+            border: 1px solid rgba(0, 242, 255, 0.2);
+            box-shadow: 0 0 15px rgba(0, 242, 255, 0.1);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .neon-border:hover {
+            border-color: rgba(0, 242, 255, 0.6);
+            box-shadow: 0 0 25px rgba(0, 242, 255, 0.2);
+        }
+
+        .neon-border-purple {
+            border: 1px solid rgba(112, 0, 255, 0.3);
+            box-shadow: 0 0 15px rgba(112, 0, 255, 0.2), inset 0 0 15px rgba(112, 0, 255, 0.1);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .neon-border-purple:hover {
+            border-color: #7000ff;
+            box-shadow: 0 0 25px rgba(112, 0, 255, 0.4), inset 0 0 10px rgba(112, 0, 255, 0.2);
+        }
+
+        .cyber-card {
+            background: rgba(15, 15, 25, 0.6);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 1rem;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .cyber-card::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(600px circle at var(--mouse-x) var(--mouse-y), rgba(0, 242, 255, 0.08), transparent 40%);
+            z-index: 0;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.5s;
+        }
+
+        .cyber-card:hover::before {
+            opacity: 1;
+        }
+
+        .cyber-card:hover {
+            transform: translateY(-4px);
+            border-color: rgba(255, 255, 255, 0.15);
+            box-shadow: 0 20px 40px -20px rgba(0, 0, 0, 0.8), 0 0 20px rgba(0, 242, 255, 0.05);
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 0.75rem;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover {
+            background: rgba(255, 255, 255, 0.05);
+            border-color: rgba(255, 255, 255, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .stat-card::after {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.03), transparent);
+            transition: left 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .stat-card:hover::after {
+            left: 100%;
+        }
+
+        /* Smooth Page Transitions */
+        .page-enter {
+            animation: pageEnter 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+        }
+
+        @keyframes pageEnter {
+            from { opacity: 0; transform: translateY(10px) scale(0.98); filter: blur(10px); }
+            to { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
+        }
+
+        .glow-text-cyan {
+            text-shadow: 0 0 10px rgba(0, 242, 255, 0.5);
+        }
+
+        .glow-text-purple {
+            text-shadow: 0 0 10px rgba(112, 0, 255, 0.5);
+        }
+
+        .glow-text-orange {
+            text-shadow: 0 0 10px rgba(249, 115, 22, 0.5);
+        }
+
+        /* Scanline and CRT effects */
+        .scanline {
+            width: 100%;
+            height: 100px;
+            z-index: 99;
+            background: linear-gradient(0deg, rgba(0, 0, 0, 0) 0%, rgba(255, 255, 255, 0.1) 50%, rgba(0, 0, 0, 0) 100%);
+            opacity: 0.1;
+            position: absolute;
+            bottom: 100%;
+            animation: scanline 10s linear infinite;
+        }
+
+        @keyframes scanline {
+            0% { bottom: 100%; }
+            100% { bottom: -100px; }
+        }
+
+        .crt-flicker {
+            animation: flicker 0.15s infinite;
+        }
+
+        @keyframes flicker {
+            0% { opacity: 0.97; }
+            5% { opacity: 0.95; }
+            10% { opacity: 0.9; }
+            15% { opacity: 0.95; }
+            20% { opacity: 0.98; }
+            25% { opacity: 0.95; }
+            30% { opacity: 0.9; }
+            35% { opacity: 0.95; }
+            40% { opacity: 0.98; }
+            45% { opacity: 0.95; }
+            50% { opacity: 0.9; }
+            55% { opacity: 0.95; }
+            60% { opacity: 0.98; }
+            65% { opacity: 0.95; }
+            70% { opacity: 0.9; }
+            75% { opacity: 0.95; }
+            80% { opacity: 0.98; }
+            85% { opacity: 0.95; }
+            90% { opacity: 0.9; }
+            95% { opacity: 0.95; }
+            100% { opacity: 0.98; }
+        }
+
+        .neon-button {
+            background: rgba(0, 242, 255, 0.05);
+            border: 1px solid rgba(0, 242, 255, 0.5);
+            color: #00f2ff;
+            padding: 0.75rem 2rem;
+            border-radius: 0.5rem;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            font-weight: 700;
+            position: relative;
+            overflow: hidden;
+            backdrop-filter: blur(5px);
+        }
+
+        .neon-button:hover {
+            background: #00f2ff;
+            color: #030305;
+            box-shadow: 0 0 30px rgba(0, 242, 255, 0.4);
+            transform: scale(1.02);
+        }
+
+        .neon-button:active {
+            transform: scale(0.98);
+        }
+
+        .progress-bar {
+            height: 4px;
+            background: #1e293b;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #00f2ff, #7000ff);
+            transition: width 0.3s ease;
+        }
+
+        @keyframes shake {
+            0% { transform: translate(1px, 1px) rotate(0deg); }
+            10% { transform: translate(-1px, -2px) rotate(-1deg); }
+            20% { transform: translate(-3px, 0px) rotate(1deg); }
+            30% { transform: translate(3px, 2px) rotate(0deg); }
+            40% { transform: translate(1px, -1px) rotate(1deg); }
+            50% { transform: translate(-1px, 2px) rotate(-1deg); }
+            60% { transform: translate(-3px, 1px) rotate(0deg); }
+            70% { transform: translate(3px, 1px) rotate(-1deg); }
+            80% { transform: translate(-1px, -1px) rotate(1deg); }
+            90% { transform: translate(1px, 2px) rotate(0deg); }
+            100% { transform: translate(1px, -2px) rotate(-1deg); }
+        }
+
+        .shake-screen {
+            animation: shake 0.2s infinite;
+        }
+
+        .flash-green {
+            animation: flashGreen 0.5s ease-out;
+        }
+
+        @keyframes flashGreen {
+            0% { background-color: rgba(34, 197, 94, 0.4); }
+            100% { background-color: transparent; }
+        }
+
+        .flash-red {
+            animation: flashRed 0.5s ease-out;
+        }
+
+        @keyframes flashRed {
+            0% { background-color: rgba(239, 68, 68, 0.4); }
+            100% { background-color: transparent; }
+        }
+
+        .feedback-pop {
+            animation: feedbackPop 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+
+        @keyframes feedbackPop {
+            0% { transform: scale(0.5); opacity: 0; }
+            50% { transform: scale(1.1); opacity: 1; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        .glitch {
+            animation: glitch 0.3s cubic-bezier(.25, .46, .45, .94) both infinite;
+        }
+
+        @keyframes glitch {
+            0% { transform: translate(0); }
+            20% { transform: translate(-2px, 2px); }
+            40% { transform: translate(-2px, -2px); }
+            60% { transform: translate(2px, 2px); }
+            80% { transform: translate(2px, -2px); }
+            100% { transform: translate(0); }
+        }
+
+        .mono-font {
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .focus-vignette {
+            background: radial-gradient(circle, transparent 20%, rgba(0, 0, 0, 0.8) 100%);
+            pointer-events: none;
+            z-index: 40;
+        }
+
+        .focus-glow {
+            box-shadow: 0 0 50px rgba(0, 242, 255, 0.2), inset 0 0 50px rgba(0, 242, 255, 0.2);
+        }
+
+        .particle {
+            position: absolute;
+            background: #00f2ff;
+            border-radius: 50%;
+            pointer-events: none;
+            opacity: 0.5;
+        }
+        /* Sidebar Layout */
+        .app-container {
+            display: flex;
+            min-height: 100vh;
+            width: 100vw;
+        }
+
+        .sidebar {
+            width: 280px;
+            background: rgba(15, 15, 25, 0.8);
+            backdrop-filter: blur(30px);
+            border-right: 1px solid rgba(255, 255, 255, 0.05);
+            display: flex;
+            flex-direction: column;
+            padding: 2rem 1.5rem;
+            z-index: 100;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .sidebar-item {
+            display: flex;
+            items-center: center;
+            padding: 1rem 1.25rem;
+            border-radius: 0.75rem;
+            color: #94a3b8;
+            font-weight: 700;
+            font-size: 0.85rem;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            margin-bottom: 0.5rem;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            border: 1px solid transparent;
+        }
+
+        .sidebar-item:hover {
+            background: rgba(255, 255, 255, 0.03);
+            color: #f1f5f9;
+        }
+
+        .sidebar-item.active {
+            background: rgba(0, 242, 255, 0.05);
+            border-color: rgba(0, 242, 255, 0.2);
+            color: #00f2ff;
+            box-shadow: 0 0 20px rgba(0, 242, 255, 0.05);
+        }
+
+        .sidebar-icon {
+            width: 20px;
+            margin-right: 1rem;
+            font-size: 1.25rem;
+        }
+
+        .main-content {
+            flex-grow: 1;
+            height: 100vh;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgba(3, 3, 5, 0.5);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: rgba(0, 242, 255, 0.2);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(0, 242, 255, 0.4);
+        }
+
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        /* SaaS Spacing Utility */
+        .section-gap {
+            gap: 2.5rem;
+        }
+    </style>
+</head>
+<body x-data="gameEngine()" class="crt-flicker overflow-hidden">
+    <!-- HTML5 Audio Elements -->
+    <audio id="clickSound" src="/static/sounds/click.mp3"></audio> 
+    <audio id="bgMusic" src="/static/sounds/bg.mp3" loop></audio> 
+    <audio id="intenseMusic" src="/static/sounds/intense.mp3" loop></audio> 
+    <audio id="successSound" src="/static/sounds/success.mp3"></audio> 
+    <audio id="errorSound" src="/static/sounds/error.mp3"></audio>
+
+    <!-- Scanline Overlay -->
+    <div class="fixed inset-0 pointer-events-none z-50 overflow-hidden opacity-20">
+        <div class="scanline"></div>
+    </div>
+
+    <!-- Canvas Background Animation Layer -->
+    <canvas id="particleCanvas" class="fixed inset-0 pointer-events-none z-0"></canvas>
+
+    <div class="app-container">
+        <!-- Sidebar Navigation (Visible only when logged in and not in game) -->
+        <nav x-show="user && screen !== 'auth' && screen !== 'game'" 
+             class="sidebar relative z-[60] page-enter">
+            <div class="mb-12 px-4">
+                <h1 class="text-2xl font-black cyber-glow italic tracking-tighter">CODERUSH</h1>
+                <div class="text-[9px] text-cyan-500 uppercase tracking-[0.4em] mt-1 font-bold">V4.0.2 Protocol</div>
+            </div>
+
+            <div class="flex-grow space-y-2">
+                <div @click="screen = 'dashboard'" class="sidebar-item" :class="screen === 'dashboard' ? 'active' : ''">
+                    <span class="sidebar-icon">📊</span> Dashboard
+                </div>
+                <div @click="screen = 'setup'" class="sidebar-item" :class="screen === 'setup' ? 'active' : ''">
+                    <span class="sidebar-icon">⚔️</span> Practice Mode
+                </div>
+                <div @click="screen = 'learn'" class="sidebar-item" :class="screen === 'learn' ? 'active' : ''">
+                    <span class="sidebar-icon">📚</span> Learning Mode
+                </div>
+                <div @click="screen = 'ai'" class="sidebar-item" :class="screen === 'ai' ? 'active' : ''">
+                    <span class="sidebar-icon">🤖</span> AI Chatbot
+                </div>
+                <div @click="screen = 'multiplayer'" class="sidebar-item" :class="screen === 'multiplayer' ? 'active' : ''">
+                    <span class="sidebar-icon">🌐</span> Multiplayer
+                </div>
+                <div @click="screen = 'stats'" class="sidebar-item" :class="screen === 'stats' ? 'active' : ''">
+                    <span class="sidebar-icon">📈</span> Track Record
+                </div>
+                
+                <!-- Master Audio Toggle -->
+                <div @click="toggleMute()" class="sidebar-item mt-8 border-t border-white/5 pt-4" :class="isMuted ? 'opacity-50' : ''">
+                    <div class="flex items-center justify-between w-full">
+                        <div class="flex items-center">
+                            <span class="sidebar-icon" x-text="isMuted ? '🔇' : '🔊'"></span>
+                            <span x-text="isMuted ? 'System Muted' : 'System Audio'"></span>
+                        </div>
+                        <div x-show="!isAudioReady && !isMuted" class="w-2 h-2 rounded-full bg-yellow-500 animate-pulse" title="Downloading Audio Assets..."></div>
+                        <div x-show="isAudioReady && !isMuted" class="w-2 h-2 rounded-full bg-green-500" title="Audio Assets Synchronized"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-auto pt-8 border-t border-slate-800 px-4">
+                <div class="flex items-center space-x-4 mb-6">
+                    <div class="w-10 h-10 rounded-lg bg-gradient-to-br from-cyan-500 to-purple-600 flex items-center justify-center font-black text-white shadow-lg">
+                        <span x-text="user?.name?.charAt(0).toUpperCase()"></span>
+                    </div>
+                    <div class="flex flex-col">
+                        <span class="text-xs font-bold text-white truncate w-32" x-text="user?.name"></span>
+                        <span class="text-[9px] text-slate-500 uppercase tracking-widest">Lvl <span x-text="Math.floor(totalXP / 1000) + 1"></span> Agent</span>
+                    </div>
+                </div>
+                <button @click="logout()" class="w-full text-left text-[10px] font-black text-red-500/70 hover:text-red-400 transition-colors uppercase tracking-[0.2em]">
+                    Terminate Link [Logout]
+                </button>
+            </div>
+        </nav>
+
+        <!-- Main Content Area -->
+        <main class="main-content">
+            <!-- Auth Screens -->
+            <div x-show="screen === 'auth'" 
+                 class="page-enter min-h-screen flex flex-col items-center justify-center relative z-10 px-6">
+        
+        <div class="mb-16 text-center">
+            <h1 class="text-7xl font-black cyber-glow italic tracking-tighter mb-4">CODERUSH</h1>
+            <div class="text-cyan-500 text-[11px] tracking-[0.6em] uppercase font-bold">Neural Security Protocol</div>
+        </div>
+
+        <div class="cyber-card p-10 w-full max-w-md shadow-[0_30px_60px_-12px_rgba(0,0,0,0.5)]">
+            <!-- Tabs -->
+            <div class="flex mb-10 border-b border-slate-800 relative z-10">
+                <button @click="authMode = 'login'; authError = ''" 
+                        class="flex-1 pb-4 text-[11px] font-black tracking-[0.2em] uppercase transition-all"
+                        :class="authMode === 'login' ? 'text-cyan-400 border-b-2 border-cyan-400' : 'text-slate-500 hover:text-slate-300'">
+                    Authenticate
+                </button>
+                <button @click="authMode = 'signup'; authError = ''" 
+                        class="flex-1 pb-4 text-[11px] font-black tracking-[0.2em] uppercase transition-all"
+                        :class="authMode === 'signup' ? 'text-cyan-400 border-b-2 border-cyan-400' : 'text-slate-500 hover:text-slate-300'">
+                    Register
+                </button>
+            </div>
+
+            <div class="space-y-8 relative z-10">
+                <div x-show="authMode === 'signup'">
+                    <label class="block text-[10px] text-slate-500 uppercase mb-3 tracking-widest font-bold">Agent Designation</label>
+                    <input type="text" x-model="authForm.name" class="w-full bg-slate-900/50 border border-slate-800 p-4 rounded-xl text-white focus:outline-none focus:border-cyan-500/50 transition-all font-mono placeholder-slate-700" placeholder="e.g. Neo">
+                </div>
+                <div>
+                    <label class="block text-[10px] text-slate-500 uppercase mb-3 tracking-widest font-bold">Neural ID (Email)</label>
+                    <input type="email" x-model="authForm.email" class="w-full bg-slate-900/50 border border-slate-800 p-4 rounded-xl text-white focus:outline-none focus:border-cyan-500/50 transition-all font-mono placeholder-slate-700" placeholder="agent@coderush.io">
+                </div>
+                <div>
+                    <label class="block text-[10px] text-slate-500 uppercase mb-3 tracking-widest font-bold">Access Key</label>
+                    <input type="password" x-model="authForm.password" class="w-full bg-slate-900/50 border border-slate-800 p-4 rounded-xl text-white focus:outline-none focus:border-cyan-500/50 transition-all font-mono placeholder-slate-700" placeholder="••••••••">
+                </div>
+
+                <div x-show="authError" x-text="authError" class="text-red-400 text-[10px] uppercase font-bold tracking-wider animate-pulse text-center"></div>
+
+                <button @click="handleAuth()" class="w-full neon-button py-5 text-lg" x-text="authMode === 'login' ? 'INITIALIZE LINK' : 'CREATE PROTOCOL'"></button>
+            </div>
+        </div>
+        
+        <div class="mt-12 text-slate-600 text-[9px] uppercase tracking-[0.5em] font-black">Secure Terminal v4.0.2</div>
+    </div>
+
+    <!-- Track Record Screen -->
+    <div x-show="screen === 'stats'" 
+         class="page-enter min-h-screen flex flex-col relative z-10 p-6 md:p-12 overflow-y-auto">
+        
+        <div class="max-w-7xl mx-auto w-full">
+            <div class="flex justify-between items-end mb-16 px-4">
+                <div>
+                    <h1 class="text-5xl font-black cyber-glow italic tracking-tighter mb-3">TRACK RECORD</h1>
+                    <div class="text-[11px] text-slate-500 uppercase tracking-[0.4em] font-bold">Historical Mission Logs</div>
+                </div>
+                <button @click="screen = 'dashboard'" class="text-slate-500 hover:text-cyan-400 transition-all uppercase text-[11px] font-black tracking-widest flex items-center group pb-2">
+                    <span class="mr-3 transition-transform group-hover:-translate-x-2">←</span> Back to Hub
+                </button>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
+                <div class="cyber-card p-10">
+                    <div class="relative z-10">
+                        <div class="text-[11px] text-slate-500 uppercase mb-4 tracking-[0.2em] font-bold">Total Solved</div>
+                        <div class="text-6xl font-black text-cyan-400 glow-text-cyan" x-text="getOverallStats().totalSolved"></div>
+                        <div class="text-[9px] text-slate-600 mt-6 uppercase tracking-widest font-bold">Lifetime Missions</div>
+                    </div>
+                </div>
+                <div class="cyber-card p-10 border-t-4 border-t-purple-500">
+                    <div class="relative z-10">
+                        <div class="text-[11px] text-slate-500 uppercase mb-4 tracking-[0.2em] font-bold">Neural Accuracy</div>
+                        <div class="text-6xl font-black text-purple-400 glow-text-purple" x-text="`${getOverallStats().accuracy}%`"></div>
+                        <div class="text-[9px] text-slate-600 mt-6 uppercase tracking-widest font-bold">Success Ratio</div>
+                    </div>
+                </div>
+                <div class="cyber-card p-10 border-t-4 border-t-orange-500">
+                    <div class="relative z-10">
+                        <div class="text-[11px] text-slate-500 uppercase mb-4 tracking-[0.2em] font-bold">Avg Latency</div>
+                        <div class="text-6xl font-black text-orange-400 glow-text-orange" x-text="`${getOverallStats().avgTime}s`"></div>
+                        <div class="text-[9px] text-slate-600 mt-6 uppercase tracking-widest font-bold">Mean Response Time</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-10">
+                <!-- Activity Graph -->
+                <div class="cyber-card p-10">
+                    <div class="relative z-10">
+                        <div class="flex items-center justify-between mb-12">
+                            <h3 class="text-[11px] font-black text-slate-400 uppercase tracking-[0.2em]">Neural Activity (7D)</h3>
+                            <div class="w-2 h-2 rounded-full bg-cyan-500 animate-ping"></div>
+                        </div>
+                        <div class="flex items-end justify-between h-56 px-4">
+                            <template x-for="day in getActivityData()" :key="day.date">
+                                <div class="flex flex-col items-center flex-1 group">
+                                    <div class="w-full max-w-[24px] bg-gradient-to-t from-cyan-600/40 to-cyan-400 rounded-t-lg transition-all duration-1000 shadow-[0_0_20px_rgba(6,182,212,0.2)] group-hover:from-cyan-500 group-hover:to-cyan-300"
+                                         :style="`height: ${Math.max(day.count * 10, 8)}%`"
+                                         :title="`${day.count} missions`"
+                                    ></div>
+                                    <div class="text-[10px] text-slate-600 mt-6 uppercase tracking-tighter font-black group-hover:text-cyan-400 transition-colors" x-text="day.date"></div>
+                                </div>
+                            </template>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recent Missions List -->
+                <div class="cyber-card p-10 max-h-[450px] overflow-y-auto custom-scrollbar">
+                    <div class="relative z-10">
+                        <h3 class="text-[11px] font-black text-slate-400 uppercase tracking-[0.2em] mb-10">Recent Operations</h3>
+                        <div class="space-y-4">
+                            <template x-for="log in history.slice().reverse().slice(0, 10)" :key="log.date">
+                                <div class="flex justify-between items-center p-5 bg-slate-900/40 border border-slate-800 rounded-xl hover:border-cyan-500/30 transition-all group">
+                                    <div class="flex flex-col">
+                                        <span class="text-[11px] font-black text-slate-200 uppercase tracking-widest mb-1" x-text="log.qid"></span>
+                                        <span class="text-[9px] text-slate-600 font-bold" x-text="new Date(log.date).toLocaleString()"></span>
+                                    </div>
+                                    <div class="flex items-center space-x-6">
+                                        <span class="text-[11px] font-mono text-slate-500 font-bold" x-text="`${log.time}s`"></span>
+                                        <span :class="log.correct ? 'text-green-400' : 'text-red-400'" class="text-[10px] font-black tracking-widest px-3 py-1 bg-slate-950 rounded-lg border border-white/5">
+                                            <template x-if="log.correct"><span>SUCCESS</span></template>
+                                            <template x-if="!log.correct"><span>FAILURE</span></template>
+                                        </span>
+                                    </div>
+                                </div>
+                            </template>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Dashboard Screen -->
+    <div x-show="screen === 'dashboard'" 
+         class="page-enter min-h-screen flex flex-col items-center relative z-10 px-4 py-12 overflow-y-auto">
+        
+        <div class="w-full max-w-7xl grid grid-cols-1 lg:grid-cols-12 gap-10 items-start px-6">
+            <!-- Left Column: Agent Stats & Motivation -->
+            <div class="lg:col-span-4 space-y-10">
+                <!-- Motivation Card -->
+                <div class="cyber-card p-8">
+                    <div class="relative z-10">
+                        <div class="flex items-center space-x-3 mb-6">
+                            <div class="w-2 h-2 rounded-full bg-cyan-500 animate-pulse"></div>
+                            <div class="text-[11px] text-slate-500 uppercase tracking-[0.2em] font-bold">Neural Feedback</div>
+                        </div>
+                        <p class="text-xl font-bold italic text-slate-200 leading-snug transition-opacity duration-500" x-text="motivationalText"></p>
+                    </div>
+                </div>
+
+                <!-- Core Stats Grid -->
+                <div class="grid grid-cols-2 gap-6">
+                    <div class="stat-card p-8 flex flex-col items-center justify-center text-center group">
+                        <div class="text-[11px] text-slate-500 uppercase tracking-[0.2em] font-bold mb-3">Current Rank</div>
+                        <div class="text-5xl font-black text-purple-400 glow-text-purple transition-all" x-text="Math.floor(totalXP / 1000) + 1"></div>
+                        <div class="text-[9px] text-slate-500 uppercase mt-4 tracking-widest">Alpha Protocol</div>
+                    </div>
+                    <div class="stat-card p-8 flex flex-col items-center justify-center text-center group">
+                        <div class="text-[11px] text-slate-500 uppercase tracking-[0.2em] font-bold mb-3">Active Streak</div>
+                        <div class="flex items-center space-x-3">
+                            <div class="text-5xl font-black text-orange-500 glow-text-orange" x-text="dailyStreak"></div>
+                            <span class="text-3xl animate-bounce" x-show="dailyStreak > 0">🔥</span>
+                        </div>
+                        <div class="text-[9px] text-slate-500 uppercase mt-4 tracking-widest">Consecutive Days</div>
+                    </div>
+                </div>
+
+                <!-- XP System Card -->
+                <div class="cyber-card p-8">
+                    <div class="relative z-10">
+                        <div class="flex justify-between items-end mb-6">
+                            <div>
+                                <div class="text-[11px] text-slate-500 uppercase tracking-[0.2em] font-bold mb-1">Experience Points</div>
+                                <div class="text-2xl font-black text-white" x-text="totalXP"></div>
+                            </div>
+                            <div class="text-xs font-bold text-cyan-400" x-text="`${totalXP % 1000} / 1000 XP`"></div>
+                        </div>
+                        <div class="w-full h-2.5 bg-slate-900 rounded-full overflow-hidden border border-slate-800">
+                            <div class="h-full bg-gradient-to-r from-cyan-500 via-purple-500 to-cyan-500 transition-all duration-1000 shadow-[0_0_15px_rgba(112,0,255,0.4)]" :style="`width: ${(totalXP % 1000) / 10}%`"></div>
+                        </div>
+                        <div class="text-[9px] text-slate-600 uppercase mt-4 tracking-widest text-center">Next Level: <span x-text="Math.floor(totalXP / 1000) + 2"></span></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Column: Primary Actions -->
+            <div class="lg:col-span-8 space-y-10">
+                <!-- Main Mission Card -->
+                <div class="cyber-card p-12 border-l-4 border-l-cyan-500">
+                    <div class="relative z-10">
+                        <div class="flex flex-col md:flex-row md:items-center justify-between gap-8 mb-12">
+                            <div>
+                                <h3 class="text-3xl font-black text-white italic tracking-tighter mb-2">DAILY PROGRESS</h3>
+                                <div class="text-[11px] text-slate-500 uppercase tracking-[0.3em] font-bold">Optimization Status</div>
+                            </div>
+                            <div class="text-right">
+                                <div class="text-6xl font-black cyber-glow text-cyan-400 mb-2 glow-text-cyan" x-text="`${getDailySolved()} / ${config.target}`"></div>
+                                <div class="text-[10px] text-slate-400 uppercase tracking-widest" x-text="getDailySolved() >= config.target ? 'Optimization Complete' : 'Awaiting Mission Start'"></div>
+                            </div>
+                        </div>
+                        
+                        <div class="w-full space-y-4 mb-12">
+                            <div class="flex justify-between text-[11px] text-slate-400 uppercase font-bold tracking-widest">
+                                <span>Core Alignment</span>
+                                <span x-text="Math.round((getDailySolved() / config.target) * 100) + '%'"></span>
+                            </div>
+                            <div class="w-full h-4 bg-slate-900 rounded-full overflow-hidden border border-slate-800 p-1">
+                                <div class="h-full bg-gradient-to-r from-cyan-600 to-cyan-400 rounded-full transition-all duration-1000 shadow-[0_0_20px_rgba(6,182,212,0.4)]" :style="`width: ${Math.min((getDailySolved() / config.target) * 100, 100)}%`"></div>
+                            </div>
+                        </div>
+
+                        <button @click="screen = 'setup'" class="w-full neon-button py-8 text-2xl tracking-[0.4em] group">
+                            INITIALIZE MISSION
+                            <span class="inline-block transition-transform group-hover:translate-x-3">→</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Elite Challenge Card -->
+                <button @click="startDailyChallenge()" class="w-full p-8 bg-gradient-to-r from-orange-500/10 via-yellow-500/5 to-transparent border border-orange-500/20 rounded-2xl flex justify-between items-center group hover:border-orange-500/50 transition-all transform hover:scale-[1.01] relative overflow-hidden">
+                    <div class="relative z-10 text-left">
+                        <div class="flex items-center space-x-3 mb-2">
+                            <span class="px-2 py-0.5 bg-orange-500 text-[9px] font-black text-black rounded uppercase tracking-tighter">Limited Time</span>
+                            <div class="text-orange-400 font-black text-2xl tracking-widest uppercase glow-text-orange">Elite Sprint</div>
+                        </div>
+                        <div class="text-[11px] text-slate-400 uppercase tracking-widest font-bold">Master Difficulty • Double XP Rewards • Full Sensory Isolation</div>
+                    </div>
+                    <div class="relative z-10 text-5xl text-orange-500 group-hover:scale-110 group-hover:rotate-12 transition-all duration-500">⚡</div>
+                    <div class="absolute inset-0 bg-orange-500/5 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Practice Setup Screen -->
+    <div x-show="screen === 'setup'" 
+         class="page-enter min-h-screen flex flex-col items-center justify-center relative z-10 px-6 py-12 overflow-y-auto">
+        
+        <div class="w-full max-w-4xl">
+            <div class="flex items-end justify-between mb-16 px-4">
+                <div>
+                    <h2 class="text-4xl font-black cyber-glow italic tracking-tighter mb-3">MISSION CONFIG</h2>
+                    <div class="text-[11px] text-slate-500 uppercase tracking-[0.4em] font-bold">Protocol Parameters</div>
+                </div>
+                <button @click="screen = 'dashboard'" class="text-slate-500 hover:text-cyan-400 transition-all uppercase text-[11px] font-black tracking-widest flex items-center group pb-2">
+                    <span class="mr-3 transition-transform group-hover:-translate-x-2">←</span> Return to Base
+                </button>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <!-- Config Card -->
+                <div class="lg:col-span-2 space-y-8">
+                    <div class="cyber-card p-10 space-y-10">
+                        <div class="relative z-10 grid grid-cols-1 md:grid-cols-2 gap-12">
+                            <div class="space-y-8">
+                                <div>
+                                    <label class="block text-[11px] text-slate-500 uppercase mb-4 tracking-[0.2em] font-bold">Neural Link</label>
+                                    <div class="relative group">
+                                        <select x-model="config.language" class="w-full bg-slate-900/80 border border-slate-800 p-5 rounded-xl text-cyan-400 font-bold focus:outline-none focus:border-cyan-500/50 transition-all text-lg appearance-none cursor-pointer">
+                                            <option value="python">Python</option>
+                                            <option value="java">Java</option>
+                                            <option value="cpp">C++</option>
+                                        </select>
+                                        <div class="absolute right-5 top-1/2 -translate-y-1/2 pointer-events-none text-slate-600 font-black">↓</div>
+                                    </div>
+                                </div>
+                                <div>
+                                    <label class="block text-[11px] text-slate-500 uppercase mb-4 tracking-[0.2em] font-bold">Complexity</label>
+                                    <div class="relative group">
+                                        <select x-model="config.difficulty" class="w-full bg-slate-900/80 border border-slate-800 p-5 rounded-xl text-cyan-400 font-bold focus:outline-none focus:border-cyan-500/50 transition-all text-lg appearance-none cursor-pointer">
+                                            <option value="Beginner">Beginner</option>
+                                            <option value="Pro">Pro</option>
+                                            <option value="Master">Master</option>
+                                        </select>
+                                        <div class="absolute right-5 top-1/2 -translate-y-1/2 pointer-events-none text-slate-600 font-black">↓</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="space-y-8">
+                                <div>
+                                    <label class="block text-[11px] text-slate-500 uppercase mb-4 tracking-[0.2em] font-bold">Mission Target</label>
+                                    <div class="bg-slate-900/80 p-6 rounded-xl border border-slate-800">
+                                        <div class="flex items-center justify-between mb-4">
+                                            <span class="text-3xl font-black text-cyan-400" x-text="config.target"></span>
+                                            <span class="text-[10px] text-slate-600 uppercase font-bold tracking-widest">Questions</span>
+                                        </div>
+                                        <input type="range" x-model="config.target" min="1" max="10" class="w-full accent-cyan-500 h-1.5 bg-slate-800 rounded-lg appearance-none cursor-pointer">
+                                    </div>
+                                </div>
+
+                                <div class="flex items-center justify-between bg-slate-900/80 p-6 rounded-xl border border-slate-800 group hover:border-cyan-500/30 transition-all">
+                                    <div>
+                                        <div class="text-[11px] font-bold text-slate-300 tracking-wider">FOCUS MODE</div>
+                                        <div class="text-[9px] text-slate-600 uppercase mt-1 font-bold">Isolation Protocol</div>
+                                    </div>
+                                    <label class="relative inline-flex items-center cursor-pointer">
+                                        <input type="checkbox" x-model="config.focusMode" class="sr-only peer">
+                                        <div class="w-12 h-6 bg-slate-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-cyan-500"></div>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Action Card -->
+                <div class="flex flex-col">
+                    <div class="cyber-card p-8 flex-grow flex flex-col justify-between border-t-4 border-t-cyan-500">
+                        <div class="relative z-10">
+                            <div class="text-[11px] text-slate-500 uppercase tracking-[0.2em] font-bold mb-6">Mission Summary</div>
+                            <div class="space-y-6">
+                                <div class="flex justify-between items-center pb-4 border-b border-slate-800">
+                                    <span class="text-[10px] text-slate-600 uppercase font-bold">Env</span>
+                                    <span class="text-sm font-black text-white uppercase" x-text="config.language"></span>
+                                </div>
+                                <div class="flex justify-between items-center pb-4 border-b border-slate-800">
+                                    <span class="text-[10px] text-slate-600 uppercase font-bold">Rank</span>
+                                    <span class="text-sm font-black text-white uppercase" x-text="config.difficulty"></span>
+                                </div>
+                                <div class="flex justify-between items-center">
+                                    <span class="text-[10px] text-slate-600 uppercase font-bold">Multiplier</span>
+                                    <span class="text-sm font-black text-cyan-400" x-text="config.difficulty === 'Master' ? '5.0x' : (config.difficulty === 'Pro' ? '2.0x' : '1.0x')"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="relative z-10 pt-12">
+                            <button @click="startTraining()" class="w-full neon-button py-6 text-xl shadow-[0_0_40px_rgba(6,182,212,0.2)]">
+                                BEGIN LINK
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Game Screen -->
+    <div x-show="screen === 'game'" 
+         class="page-enter min-h-screen flex flex-col relative z-10 overflow-hidden" 
+         :class="[timeLeft < 10 ? 'shake-screen' : '', feedbackEffect === 'correct' ? 'flash-green' : '', feedbackEffect === 'wrong' ? 'flash-red' : '']">
+        
+        <!-- Immersive Background Overlays -->
+        <div class="fixed inset-0 focus-vignette z-0 pointer-events-none transition-opacity duration-1000" :class="config.focusMode ? 'opacity-100' : 'opacity-50'"></div>
+        <div x-show="timeLeft < 10" class="fixed inset-0 border-[20px] border-red-600/20 pointer-events-none animate-pulse z-20"></div>
+
+        <!-- Feedback Overlay -->
+        <div x-show="feedbackEffect" class="fixed inset-0 z-[100] flex items-center justify-center pointer-events-none">
+            <div class="feedback-pop px-12 py-6 rounded-lg border-4 text-6xl font-black italic tracking-tighter shadow-[0_0_50px_rgba(0,0,0,0.5)]"
+                 :class="feedbackEffect === 'correct' ? 'bg-green-500/20 border-green-500 text-green-500 shadow-green-500/30' : 'bg-red-500/20 border-red-500 text-red-500 shadow-red-500/30'">
+                <template x-if="feedbackEffect === 'correct'"><span>CORRECT!</span></template>
+                <template x-if="feedbackEffect === 'wrong'"><span>INCORRECT!</span></template>
+            </div>
+        </div>
+
+        <!-- Correct Answer Reveal Overlay -->
+        <div x-show="feedbackEffect === 'wrong' && currentQuestion" class="fixed bottom-32 left-1/2 -translate-x-1/2 z-[100] w-full max-w-2xl px-4 animate-bounce">
+            <div class="cyber-card p-6 border border-green-500/50 bg-slate-900/90 rounded-lg text-center">
+                <div class="text-[10px] text-green-500 uppercase tracking-widest mb-2 font-bold">Expected Input</div>
+                <code class="text-xl text-white font-mono" x-text="currentQuestion.answer"></code>
+            </div>
+        </div>
+
+        <!-- Top Centered Countdown -->
+        <div class="fixed top-12 left-1/2 -translate-x-1/2 z-50 text-center">
+            <div class="text-[10px] text-slate-500 uppercase tracking-[0.5em] mb-2 opacity-50" x-show="!config.focusMode">Time Remaining</div>
+            <div class="text-7xl font-black tracking-tighter cyber-glow transition-all duration-300" 
+                 :class="timeLeft < 10 ? 'text-red-500 scale-110' : 'text-white'" 
+                 x-text="formatTime(timeLeft)"></div>
+            
+            <!-- Minimal Progress Bar below timer -->
+            <div class="w-64 h-1 bg-slate-900 rounded-full mt-4 overflow-hidden border border-slate-800 mx-auto" x-show="!config.focusMode">
+                <div class="h-full bg-gradient-to-r from-cyan-500 to-purple-600 transition-all duration-1000" 
+                     :style="`width: ${(currentIdx / config.target) * 100}%`"></div>
+            </div>
+        </div>
+
+        <!-- Minimal Side Stats (Hidden in standard view, shown subtly) -->
+        <div x-show="!config.focusMode" class="fixed left-8 top-1/2 -translate-y-1/2 space-y-8 z-30 opacity-30 hover:opacity-100 transition-opacity">
+            <template x-if="!isMultiplayer">
+                <div>
+                    <div class="text-left mb-8">
+                        <div class="text-[8px] text-slate-500 uppercase tracking-widest mb-1">Mission</div>
+                        <div class="text-xl font-bold text-cyan-400" x-text="`${currentIdx + 1} / ${config.target}`"></div>
+                    </div>
+                    <div class="text-left">
+                        <div class="text-[8px] text-slate-500 uppercase tracking-widest mb-1">Streak</div>
+                        <div class="text-xl font-bold text-yellow-400" x-text="`x${streak}`"></div>
+                    </div>
+                </div>
+            </template>
+            
+            <template x-if="isMultiplayer">
+                <div class="space-y-12">
+                    <div class="text-left p-4 rounded-lg border-l-4 transition-all duration-500" 
+                         :class="activePlayer === 1 ? 'border-cyan-500 bg-cyan-500/10 opacity-100' : 'border-slate-800 opacity-50'">
+                        <div class="text-[10px] text-slate-500 uppercase font-black tracking-widest mb-1" x-text="player1.name"></div>
+                        <div class="text-3xl font-black text-cyan-400" x-text="player1.score"></div>
+                        <div x-show="activePlayer === 1" class="text-[8px] text-cyan-500 uppercase mt-2 animate-pulse">ACTIVE_LINK</div>
+                    </div>
+                    <div class="text-left p-4 rounded-lg border-l-4 transition-all duration-500" 
+                         :class="activePlayer === 2 ? 'border-purple-500 bg-purple-500/10 opacity-100' : 'border-slate-800 opacity-50'">
+                        <div class="text-[10px] text-slate-500 uppercase font-black tracking-widest mb-1" x-text="player2.name"></div>
+                        <div class="text-3xl font-black text-purple-400" x-text="player2.score"></div>
+                        <div x-show="activePlayer === 2" class="text-[8px] text-purple-500 uppercase mt-2 animate-pulse">ACTIVE_LINK</div>
+                    </div>
+                </div>
+            </template>
+        </div>
+
+        <!-- Main Question & Editor Area -->
+        <div class="flex-grow flex flex-col items-center justify-center max-w-5xl mx-auto w-full relative z-10 px-4">
+            <div class="w-full space-y-8">
+                <!-- Question Section -->
+                <div class="text-center space-y-4">
+                    <h2 class="text-3xl md:text-5xl font-black italic tracking-tighter cyber-glow" x-text="currentQuestion.title"></h2>
+                    <p class="text-xl text-slate-400 mono-font max-w-3xl mx-auto leading-relaxed" x-text="currentQuestion.description"></p>
+                </div>
+
+                <!-- Code Editor / Input Section -->
+                <div class="w-full">
+                    <!-- MCQ Options -->
+                    <template x-if="currentQuestion.type === 'mcq'">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 w-full max-w-4xl mx-auto">
+                            <template x-for="option in currentQuestion.options" :key="option">
+                                <button 
+                                    @click="userInput = option; submitSolution()"
+                                    class="cyber-card p-6 text-xl font-bold tracking-widest text-white hover:border-cyan-500 transition-all text-left flex items-center group"
+                                    :class="userInput === option ? 'border-cyan-500 bg-cyan-500/10' : ''"
+                                >
+                                    <div class="w-8 h-8 rounded-full border-2 border-slate-700 mr-6 flex items-center justify-center group-hover:border-cyan-500 transition-colors">
+                                        <div class="w-4 h-4 rounded-full bg-cyan-500 scale-0 transition-transform" :class="userInput === option ? 'scale-100' : ''"></div>
+                                    </div>
+                                    <span x-text="option"></span>
+                                </button>
+                            </template>
+                        </div>
+                    </template>
+
+                    <!-- Coding / Fill / Debug / Predict Input -->
+                    <template x-if="currentQuestion.type !== 'mcq'">
+                        <div class="cyber-card p-1 rounded-lg border border-slate-700/50 bg-slate-950/80 focus-glow relative group">
+                            <div class="absolute -inset-0.5 bg-gradient-to-r from-cyan-500/20 to-purple-600/20 rounded-lg blur opacity-0 group-hover:opacity-100 transition duration-1000"></div>
+                            
+                            <div class="relative rounded-lg overflow-hidden">
+                                <!-- Editor Header -->
+                                <div class="flex items-center justify-between px-6 py-4 bg-slate-900/50 border-b border-slate-800" x-show="!config.focusMode">
+                                    <div class="flex space-x-2">
+                                        <div class="w-2.5 h-2.5 rounded-full bg-red-500/50"></div>
+                                        <div class="w-2.5 h-2.5 rounded-full bg-yellow-500/50"></div>
+                                        <div class="w-2.5 h-2.5 rounded-full bg-green-500/50"></div>
+                                    </div>
+                                    <div class="flex items-center space-x-3">
+                                        <span class="text-[10px] text-slate-500 font-bold tracking-widest uppercase" x-text="config.language"></span>
+                                        <div class="w-2 h-2 rounded-full bg-cyan-500 animate-pulse"></div>
+                                    </div>
+                                </div>
+
+                                <!-- Textarea / Single Line Input -->
+                                <template x-if="currentQuestion.type === 'coding' || currentQuestion.type === 'debug'">
+                                    <textarea 
+                                        x-model="userInput" 
+                                        class="w-full h-80 bg-slate-950/50 p-8 mono-font text-cyan-400 focus:outline-none resize-none text-2xl leading-relaxed"
+                                        spellcheck="false"
+                                        :placeholder="currentQuestion.type === 'coding' ? `// Write code...` : `// Fix the bug...`"
+                                        @keydown.tab.prevent="userInput += '    '"
+                                        autofocus
+                                    ></textarea>
+                                </template>
+
+                                <template x-if="currentQuestion.type === 'predict' || currentQuestion.type === 'fill'">
+                                    <input 
+                                        type="text"
+                                        x-model="userInput"
+                                        class="w-full bg-slate-950/50 p-12 mono-font text-cyan-400 focus:outline-none text-4xl text-center"
+                                        :placeholder="currentQuestion.type === 'predict' ? 'Result?' : 'Missing keyword...'"
+                                        @keydown.enter="submitSolution()"
+                                        autofocus
+                                    >
+                                </template>
+                            </div>
+                        </div>
+                    </template>
+                </div>
+
+                <!-- Action Button -->
+                <div class="flex justify-center pt-4" x-show="currentQuestion.type !== 'mcq'">
+                    <button @click="submitSolution()" class="neon-button px-16 py-5 text-lg transform hover:scale-105 active:scale-95 transition-all shadow-[0_0_40px_rgba(6,182,212,0.2)]">
+                        EXECUTE COMMAND
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bottom Exit Hint -->
+        <div x-show="!config.focusMode" class="fixed bottom-8 left-1/2 -translate-x-1/2 z-30 opacity-20 hover:opacity-100 transition-opacity">
+            <button @click="if(confirm('Abort Mission? Progress will be lost.')) resetGame()" class="text-[10px] text-slate-500 uppercase tracking-[0.4em] hover:text-red-500 transition-colors">
+                [ ABORT_MISSION ]
+            </button>
+        </div>
+    </div>
+
+    <!-- Result Screen -->
+    <div x-show="screen === 'result'" 
+         class="page-enter min-h-screen flex flex-col items-center justify-center relative z-10 px-4 text-center">
+        
+        <div class="mb-8">
+            <template x-if="!isMultiplayer">
+                <h1 class="text-6xl font-black mb-2 cyber-glow-purple italic">MISSION COMPLETED</h1>
+            </template>
+            <template x-if="isMultiplayer">
+                <h1 class="text-6xl font-black mb-2 glow-text-orange italic uppercase" x-text="`${multiplayerWinner} VICTORIOUS` "></h1>
+            </template>
+            <div class="text-orange-400 font-bold tracking-[0.5em] uppercase text-sm" x-text="isMultiplayer ? 'Combat Results' : `Rank: ${config.difficulty}`"></div>
+        </div>
+        
+        <div class="cyber-card p-12 rounded-lg neon-border-purple w-full max-w-2xl relative overflow-hidden">
+            <div class="relative z-10">
+                <!-- XP Progress Bar (Hidden in Multiplayer) -->
+                <div x-show="!isMultiplayer" class="absolute -top-12 left-0 w-full h-1 bg-slate-800">
+                    <div class="h-full bg-cyan-500 transition-all duration-1000 shadow-[0_0_10px_#00f2ff]" :style="`width: ${(totalXP % 1000) / 10}%`"></div>
+                </div>
+
+                <template x-if="!isMultiplayer">
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-8 mb-12">
+                        <div>
+                            <div class="text-[10px] text-slate-500 uppercase mb-2">Solved</div>
+                            <div class="text-3xl font-bold text-cyan-400 glow-text-cyan" x-text="`${stats.solved}/${config.target}`"></div>
+                        </div>
+                        <div>
+                            <div class="text-[10px] text-slate-500 uppercase mb-2">XP Earned</div>
+                            <div class="text-3xl font-bold text-purple-400 glow-text-purple" x-text="`+${calculateXP()}`"></div>
+                        </div>
+                        <div>
+                            <div class="text-[10px] text-slate-500 uppercase mb-2">Max Streak</div>
+                            <div class="text-3xl font-bold text-yellow-400 glow-text-orange" x-text="`x${maxStreak}`"></div>
+                        </div>
+                        <div>
+                            <div class="text-[10px] text-slate-500 uppercase mb-2">Global Rank</div>
+                            <div class="text-3xl font-bold text-green-400" x-text="`TOP ${stats.beatPercentage}%`"></div>
+                        </div>
+                    </div>
+                </template>
+
+                <template x-if="isMultiplayer">
+                    <div class="grid grid-cols-2 gap-12 mb-12">
+                        <div class="p-8 rounded-xl border-2" :class="player1.score >= player2.score ? 'border-cyan-500 bg-cyan-500/5' : 'border-slate-800 opacity-50'">
+                            <div class="text-[11px] text-slate-500 uppercase font-black tracking-[0.2em] mb-4" x-text="player1.name"></div>
+                            <div class="text-6xl font-black text-cyan-400 mb-2" x-text="player1.score"></div>
+                            <div x-show="player1.score >= player2.score" class="text-[10px] text-cyan-500 font-bold tracking-widest">DOMINANT</div>
+                        </div>
+                        <div class="p-8 rounded-xl border-2" :class="player2.score >= player1.score ? 'border-purple-500 bg-purple-500/5' : 'border-slate-800 opacity-50'">
+                            <div class="text-[11px] text-slate-500 uppercase font-black tracking-[0.2em] mb-4" x-text="player2.name"></div>
+                            <div class="text-6xl font-black text-purple-400 mb-2" x-text="player2.score"></div>
+                            <div x-show="player2.score >= player1.score" class="text-[10px] text-purple-500 font-bold tracking-widest">DOMINANT</div>
+                        </div>
+                    </div>
+                </template>
+
+                <div class="bg-slate-900/50 p-6 border border-slate-800 rounded-lg mb-12">
+                    <p class="text-xl text-slate-300 italic mono-font mb-2" x-text="isMultiplayer ? (player1.score === player2.score ? 'STALEMATE DETECTED. RETRAIN.' : 'COMBAT SEQUENCE FINALIZED.') : getMotivationalMessage()"></p>
+                    <div x-show="!isMultiplayer" class="text-xs text-slate-500 uppercase tracking-widest mb-4" x-text="`You performed better than ${100 - stats.beatPercentage}% of agents today.`"></div>
+                    <!-- Daily Progress in End Screen -->
+                    <div x-show="!isMultiplayer" class="flex flex-col items-center border-t border-slate-800 pt-4">
+                        <div class="text-[10px] text-slate-500 uppercase tracking-widest mb-1">Today's Daily Goal Progress</div>
+                        <div class="text-xl font-bold text-cyan-400" x-text="`${getDailySolved()} / ${config.target}`"></div>
+                    </div>
+                </div>
+
+                <div class="flex flex-col md:flex-row space-y-4 md:space-y-0 md:space-x-4 justify-center">
+                    <button @click="resetGame()" class="neon-button border-purple-500 text-purple-500 hover:bg-purple-500/20">
+                        RETURN TO BASE
+                    </button>
+                    <button @click="isMultiplayer ? initializeMultiplayer() : startTraining()" class="neon-button">
+                        RE-DEPLOY
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Learning Mode Screen -->
+    <div x-show="screen === 'learn'" 
+         class="page-enter min-h-screen flex flex-col relative z-10 px-6 py-12 overflow-y-auto">
+        
+        <div class="max-w-7xl mx-auto w-full">
+            <div class="flex justify-between items-end mb-16 px-4">
+                <div>
+                    <h1 class="text-5xl font-black cyber-glow italic tracking-tighter mb-3 uppercase">NEURAL ARCHIVE</h1>
+                    <div class="text-[11px] text-slate-500 uppercase tracking-[0.4em] font-bold">Knowledge Acquisition Protocol</div>
+                </div>
+                <button @click="screen = 'dashboard'" class="text-slate-500 hover:text-cyan-400 transition-all uppercase text-[11px] font-black tracking-widest flex items-center group pb-2">
+                    <span class="mr-3 transition-transform group-hover:-translate-x-2">←</span> Exit Archive
+                </button>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
+                <!-- Topic Navigation -->
+                <div class="lg:col-span-3 space-y-4">
+                    <template x-for="(content, key) in learnContent" :key="key">
+                        <div @click="selectedLearnTopic = key" 
+                             class="cyber-card p-6 cursor-pointer transition-all border-l-4"
+                             :class="selectedLearnTopic === key ? 'border-l-cyan-500 bg-cyan-500/5' : 'border-l-transparent hover:border-l-slate-700'">
+                            <div class="flex items-center space-x-4">
+                                <span class="text-2xl" x-text="content.icon"></span>
+                                <span class="font-black text-sm uppercase tracking-widest" 
+                                      :class="selectedLearnTopic === key ? 'text-white' : 'text-slate-500'" 
+                                      x-text="key"></span>
+                            </div>
+                        </div>
+                    </template>
+                </div>
+
+                <!-- Content Area -->
+                <div class="lg:col-span-9 space-y-10">
+                    <div class="cyber-card p-12">
+                        <div class="relative z-10">
+                            <div class="flex items-center space-x-4 mb-8">
+                                <span class="text-4xl" x-text="learnContent[selectedLearnTopic].icon"></span>
+                                <h2 class="text-3xl font-black text-white italic tracking-tighter" x-text="learnContent[selectedLearnTopic].title"></h2>
+                            </div>
+
+                            <div class="prose prose-invert max-w-none mb-12">
+                                <p class="text-slate-300 text-lg leading-relaxed" x-text="learnContent[selectedLearnTopic].explanation"></p>
+                            </div>
+
+                            <!-- Example Code -->
+                            <div class="mb-12">
+                                <div class="text-[11px] text-slate-500 uppercase font-black tracking-[0.2em] mb-4">Neural Example (Python)</div>
+                                <div class="relative rounded-xl overflow-hidden border border-slate-800 bg-slate-950/80 p-8">
+                                    <pre class="mono-font text-cyan-400 text-xl leading-relaxed"><code x-text="learnContent[selectedLearnTopic].example"></code></pre>
+                                </div>
+                            </div>
+
+                            <!-- Mini Practice -->
+                            <div class="bg-slate-900/40 border border-slate-800 rounded-2xl p-10">
+                                <div class="text-[11px] text-cyan-500 uppercase font-black tracking-[0.2em] mb-6">Validation Check</div>
+                                <p class="text-xl font-bold text-white mb-8" x-text="learnContent[selectedLearnTopic].practice.description"></p>
+                                
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <template x-for="opt in learnContent[selectedLearnTopic].practice.options" :key="opt">
+                                        <button @click="if(opt === learnContent[selectedLearnTopic].practice.answer) { alert('Correct! Neural link stabilized.'); } else { alert('Incorrect. Logic error detected.'); }"
+                                                class="stat-card p-5 text-left text-sm font-bold text-slate-400 hover:text-white hover:border-cyan-500/50 transition-all">
+                                            <span x-text="opt"></span>
+                                        </button>
+                                    </template>
+                                </div>
+                            </div>
+
+                            <div class="mt-12 flex justify-end">
+                                <button @click="screen = 'setup'; config.language = 'python'" class="neon-button text-lg px-12 py-6">
+                                    Start Full Practice →
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- AI Chatbot Screen -->
+    <div x-show="screen === 'ai'" 
+         class="page-enter min-h-screen flex flex-col relative z-10 px-6 py-12 overflow-hidden">
+        
+        <div class="max-w-5xl mx-auto w-full h-full flex flex-col">
+            <div class="flex justify-between items-end mb-8 px-4 flex-shrink-0">
+                <div>
+                    <h1 class="text-5xl font-black cyber-glow-purple italic tracking-tighter mb-3 uppercase">SYNTHETIC ASSISTANT</h1>
+                    <div class="text-[11px] text-slate-500 uppercase tracking-[0.4em] font-bold">AI Neural Integration Link</div>
+                </div>
+                <button @click="screen = 'dashboard'" class="text-slate-500 hover:text-purple-400 transition-all uppercase text-[11px] font-black tracking-widest flex items-center group pb-2">
+                    <span class="mr-3 transition-transform group-hover:-translate-x-2">←</span> Terminate Session
+                </button>
+            </div>
+
+            <!-- Chat Interface -->
+            <div class="cyber-card flex-grow flex flex-col overflow-hidden border-t-4 border-t-purple-500 relative">
+                <div class="absolute inset-0 bg-slate-950/20 pointer-events-none"></div>
+                
+                <!-- Messages Area -->
+                <div id="chatContainer" class="flex-grow overflow-y-auto p-8 space-y-8 relative z-10 custom-scrollbar">
+                    <template x-for="(msg, index) in chatHistory" :key="index">
+                        <div class="flex flex-col" :class="msg.role === 'user' ? 'items-end' : 'items-start'">
+                            <div class="flex items-center space-x-2 mb-2">
+                                <span class="text-[9px] font-black uppercase tracking-widest" :class="msg.role === 'user' ? 'text-slate-500' : 'text-purple-400'" x-text="msg.role === 'user' ? 'Agent' : 'Synthetic_AI'"></span>
+                            </div>
+                            <div class="max-w-[80%] p-5 rounded-2xl text-sm font-bold leading-relaxed whitespace-pre-wrap"
+                                 :class="msg.role === 'user' ? 'bg-slate-800 text-slate-200 rounded-tr-none' : 'bg-purple-500/10 border border-purple-500/20 text-purple-100 rounded-tl-none'">
+                                <span x-text="msg.content"></span>
+                            </div>
+                        </div>
+                    </template>
+
+                    <!-- Typing Indicator -->
+                    <div x-show="isChatTyping" class="flex flex-col items-start">
+                        <div class="flex items-center space-x-2 mb-2">
+                            <span class="text-[9px] font-black uppercase tracking-widest text-purple-400">Synthetic_AI</span>
+                        </div>
+                        <div class="bg-purple-500/10 border border-purple-500/20 p-4 rounded-2xl rounded-tl-none flex space-x-1">
+                            <div class="w-1.5 h-1.5 bg-purple-400 rounded-full animate-bounce"></div>
+                            <div class="w-1.5 h-1.5 bg-purple-400 rounded-full animate-bounce [animation-delay:0.2s]"></div>
+                            <div class="w-1.5 h-1.5 bg-purple-400 rounded-full animate-bounce [animation-delay:0.4s]"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Chat Controls -->
+                <div class="p-6 bg-slate-900/50 border-t border-slate-800 relative z-20">
+                    <div class="flex items-center space-x-4 mb-4">
+                        <button @click="generateSimilarQuestion()" class="text-[10px] font-black uppercase tracking-widest px-4 py-2 bg-purple-500/10 border border-purple-500/30 text-purple-400 rounded-lg hover:bg-purple-500/20 transition-all">
+                            Generate Practice Mission
+                        </button>
+                        <button @click="chatHistory = [{ role: 'ai', content: 'Neural buffer cleared. How can I assist, Agent?' }]" class="text-[10px] font-black uppercase tracking-widest px-4 py-2 border border-slate-800 text-slate-500 rounded-lg hover:text-slate-300 transition-all">
+                            Clear Buffer
+                        </button>
+                    </div>
+                    <div class="relative">
+                        <input type="text" 
+                               x-model="chatInput" 
+                               @keydown.enter="sendChatMessage()"
+                               class="w-full bg-slate-950 border border-slate-800 p-5 pr-32 rounded-xl text-white font-bold focus:outline-none focus:border-purple-500/50 transition-all font-mono" 
+                               placeholder="Input neural query [e.g. 'How do loops work?']">
+                        <button @click="sendChatMessage()" class="absolute right-3 top-1/2 -translate-y-1/2 neon-button border-purple-500 text-purple-500 hover:bg-purple-500/20 py-2 px-6 text-xs">
+                            EXECUTE
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Multiplayer Screen -->
+    <div x-show="screen === 'multiplayer'" 
+         class="page-enter min-h-screen flex flex-col items-center justify-center relative z-10 px-6 text-center">
+        <div class="w-full max-w-4xl">
+            <div class="mb-16">
+                <h2 class="text-5xl font-black glow-text-orange italic tracking-tighter mb-4 uppercase">DUEL PROTOCOL</h2>
+                <p class="text-slate-400 font-bold uppercase tracking-[0.4em]">Local Synchronous Combat</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-10 mb-12">
+                <!-- Player 1 Setup -->
+                <div class="cyber-card p-10 border-t-4 border-t-cyan-500">
+                    <div class="relative z-10 space-y-8">
+                        <div class="text-4xl mb-4">👤</div>
+                        <div>
+                            <label class="block text-[11px] text-slate-500 uppercase mb-4 tracking-[0.2em] font-bold">Initiator [P1]</label>
+                            <input type="text" x-model="multiplayerConfig.player1Name" 
+                                   class="w-full bg-slate-900/50 border border-slate-800 p-5 rounded-xl text-cyan-400 font-bold focus:outline-none focus:border-cyan-500/50 transition-all text-xl text-center font-mono" 
+                                   :placeholder="user?.name || 'Player 1'">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Player 2 Setup -->
+                <div class="cyber-card p-10 border-t-4 border-t-purple-500">
+                    <div class="relative z-10 space-y-8">
+                        <div class="text-4xl mb-4">👤</div>
+                        <div>
+                            <label class="block text-[11px] text-slate-500 uppercase mb-4 tracking-[0.2em] font-bold">Challenger [P2]</label>
+                            <input type="text" x-model="multiplayerConfig.player2Name" 
+                                   class="w-full bg-slate-900/50 border border-slate-800 p-5 rounded-xl text-purple-400 font-bold focus:outline-none focus:border-purple-500/50 transition-all text-xl text-center font-mono" 
+                                   placeholder="Opponent Name">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="cyber-card p-10 mb-12">
+                <div class="relative z-10 grid grid-cols-1 md:grid-cols-2 gap-12 text-left">
+                    <div>
+                        <label class="block text-[11px] text-slate-500 uppercase mb-4 tracking-[0.2em] font-bold text-center">Neural Link (Language)</label>
+                        <select x-model="config.language" class="w-full bg-slate-900/80 border border-slate-800 p-5 rounded-xl text-cyan-400 font-bold focus:outline-none focus:border-cyan-500/50 transition-all text-lg appearance-none cursor-pointer text-center">
+                            <option value="python">Python</option>
+                            <option value="java">Java</option>
+                            <option value="cpp">C++</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-[11px] text-slate-500 uppercase mb-4 tracking-[0.2em] font-bold text-center">Combat Missions</label>
+                        <div class="bg-slate-900/80 p-5 rounded-xl border border-slate-800 flex items-center space-x-6">
+                            <input type="range" x-model="config.target" min="1" max="5" class="w-full accent-orange-500 h-1.5 bg-slate-800 rounded-lg appearance-none cursor-pointer">
+                            <span class="text-3xl font-black text-orange-500 w-12 text-center" x-text="config.target"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex flex-col md:flex-row gap-6 justify-center">
+                <button @click="screen = 'dashboard'" class="neon-button border-slate-500 text-slate-500 hover:bg-slate-500/10 px-12 py-6">Abort</button>
+                <button @click="initializeMultiplayer()" class="neon-button border-orange-500 text-orange-500 hover:bg-orange-500/20 px-12 py-6 text-2xl tracking-[0.4em]">
+                    START DUEL
+                </button>
+            </div>
+        </div>
+    </div>
+
+    </main> <!-- End of Main Content -->
+    </div> <!-- End of App Container -->
+
+    <script>
+        function gameEngine() {
+            return {
+                screen: 'auth', // auth, dashboard, setup, game, result, stats, learn, ai, multiplayer
+                user: JSON.parse(localStorage.getItem('coderush_session') || 'null'),
+                authMode: 'login', // login, signup
+                authForm: {
+                    name: '',
+                    email: '',
+                    password: ''
+                },
+                authError: '',
+                history: [], // [{qid, correct, time, date}]
+                motivationalText: "Keep pushing. You're becoming better every day.",
+                dashboardQuotes: [
+                    "Keep pushing. You're becoming better every day.",
+                    "Code is like magic. Master the spells.",
+                    "Focus on the process, the results will follow.",
+                    "Every error is a lesson in disguise.",
+                    "Consistency is the key to mastery.",
+                    "The only way to learn is by doing.",
+                    "Your limits are only in your mind."
+                ],
+                config: {
+                    language: 'python',
+                    target: 3,
+                    timePerQuestion: 1,
+                    focusMode: false,
+                    difficulty: 'Pro' // Beginner, Pro, Master
+                },
+                currentIdx: 0,
+                timeLeft: 60,
+                currentSessionHistory: [], // [{qid, correct, time, date}]
+                score: 0,
+                streak: 0,
+                maxStreak: 0,
+                totalXP: parseInt(localStorage.getItem('coderush_xp') || '0'),
+                dailyStreak: parseInt(localStorage.getItem('coderush_streak') || '0'),
+                isDailyChallenge: false,
+                isMuted: localStorage.getItem('coderush_muted') === 'true',
+                isAudioReady: false,
+                userInput: '',
+                // Multiplayer State
+                isMultiplayer: false,
+                player1: { name: '', score: 0 },
+                player2: { name: '', score: 0 },
+                activePlayer: 1, // 1 or 2
+                multiplayerConfig: {
+                    player1Name: '',
+                    player2Name: ''
+                },
+                multiplayerWinner: null,
+                // Learning Mode State
+                selectedLearnTopic: 'loops',
+                learnContent: {
+                    loops: {
+                        title: 'Control Flow: Loops',
+                        icon: '🔄',
+                        explanation: 'Loops are used to repeat a block of code multiple times. In most languages, we have "for" loops for a known number of iterations and "while" loops for condition-based iteration.',
+                        example: 'for i in range(5):\n    print(f"Iteration {i}")',
+                        practice: {
+                            description: 'How many times will a loop "for i in range(3)" run?',
+                            options: ['2', '3', '4', '0'],
+                            answer: '3'
+                        }
+                    },
+                    arrays: {
+                        title: 'Data Structures: Arrays/Lists',
+                        icon: '📊',
+                        explanation: 'Arrays (or Lists in Python) store multiple items in a single variable. Items are indexed starting from 0. They are essential for managing collections of data.',
+                        example: 'fruits = ["Apple", "Cyber-Berry", "Neon-Lime"]\nprint(fruits[1]) # Output: Cyber-Berry',
+                        practice: {
+                            description: 'What is the index of the first element in an array?',
+                            options: ['1', '-1', '0', 'None'],
+                            answer: '0'
+                        }
+                    },
+                    functions: {
+                        title: 'Modularity: Functions',
+                        icon: '📦',
+                        explanation: 'Functions are reusable blocks of code that perform a specific task. They take inputs (arguments) and can return a result.',
+                        example: 'def greet(name):\n    return f"Greetings, {name}!"\n\nmsg = greet("Agent")',
+                        practice: {
+                            description: 'Which keyword is used to define a function in Python?',
+                            options: ['function', 'func', 'def', 'define'],
+                            answer: 'def'
+                        }
+                    }
+                },
+                // AI Chatbot State
+                chatInput: '',
+                isChatTyping: false,
+                chatHistory: [
+                    { role: 'ai', content: 'Greetings, Agent. I am the Synthetic Assistant. How can I assist with your neural training today?' }
+                ],
+                timerId: null,
+                feedbackEffect: null,
+                stats: {
+                    solved: 0,
+                    timeTaken: 0,
+                    beatPercentage: 0
+                },
+                questions: {
+                    python: [
+                        // Coding Type
+                        { type: 'coding', title: 'Python: Sum Function', description: 'Write a function that returns the sum of a and b.', answer: 'return a + b' },
+                        { type: 'coding', title: 'Python: Is Even?', description: 'Write a function that returns True if n is even.', answer: 'return n % 2 == 0' },
+                        // Prediction Type
+                        { type: 'predict', title: 'Python: Output Prediction', description: 'What is the output of print(2**3)?', answer: '8' },
+                        { type: 'predict', title: 'Python: List Output', description: 'What is the output of print([1, 2] * 2)?', answer: '[1, 2, 1, 2]' },
+                        // Debug Type
+                        { type: 'debug', title: 'Python: Debug Loop', description: 'Fix the error: for i in range(5) print(i)', answer: 'for i in range(5):' },
+                        { type: 'debug', title: 'Python: Debug Func', description: 'Fix the error: def func(a, b) return a+b', answer: 'def func(a, b):' },
+                        // MCQ Type
+                        { type: 'mcq', title: 'Python: Data Types', description: 'Which of these is immutable?', options: ['List', 'Dictionary', 'Tuple', 'Set'], answer: 'Tuple' },
+                        { type: 'mcq', title: 'Python: Logic', description: 'What does "not True" evaluate to?', options: ['True', 'False', 'None', 'Error'], answer: 'False' },
+                        // Fill in the blanks Type
+                        { type: 'fill', title: 'Python: Keywords', description: 'To exit a loop prematurely, use the ____ keyword.', answer: 'break' },
+                        { type: 'fill', title: 'Python: Definition', description: 'Functions are defined using the ____ keyword.', answer: 'def' }
+                    ],
+                    java: [
+                        { type: 'coding', title: 'Java: Print Line', description: 'Complete the main method to print "Hello World".', answer: 'System.out.println("Hello World");' },
+                        { type: 'predict', title: 'Java: Integer Division', description: 'What is the output of System.out.print(5/2)?', answer: '2' },
+                        { type: 'mcq', title: 'Java: Memory', description: 'Which area stores object instances?', options: ['Stack', 'Heap', 'Method Area', 'PC Register'], answer: 'Heap' },
+                        { type: 'debug', title: 'Java: Debug Class', description: 'Fix the error: public class Main { void main() }', answer: 'public static void main' },
+                        { type: 'fill', title: 'Java: Inheritance', description: 'The ____ keyword is used to inherit a class.', answer: 'extends' }
+                    ],
+                    cpp: [
+                        { type: 'coding', title: 'C++: Vector Push', description: 'Add element x to vector v.', answer: 'v.push_back(x);' },
+                        { type: 'predict', title: 'C++: Pointer Output', description: 'int x=5; int* p=&x; cout << *p;', answer: '5' },
+                        { type: 'mcq', title: 'C++: Standard', description: 'Which header is used for input/output?', options: ['<vector>', '<iostream>', '<string>', '<cmath>'], answer: '<iostream>' },
+                        { type: 'debug', title: 'C++: Debug Namespace', description: 'Fix the error: cout << "Hi"; (missing namespace)', answer: 'std::cout << "Hi";' },
+                        { type: 'fill', title: 'C++: Memory', description: 'The ____ operator is used to allocate memory dynamically.', answer: 'new' }
+                    ]
+                },
+                sessionQuestions: [],
+                currentQuestion: null,
+                
+                // Audio Players (Hybrid System)
+                urgencySynth: null,
+                droneSynth: null,
+                uiSynth: null,
+
+                init() {
+                    this.initCanvasParticles();
+                    this.initAudio();
+                    window.addEventListener('resize', () => this.resizeCanvas());
+                    
+                    // Add global click sound for all buttons
+                    document.addEventListener('click', (e) => {
+                        if (e.target.closest('button')) {
+                            this.playClick();
+                        }
+                        
+                        // Ensure Tone context is resumed on any interaction
+                        if (Tone.context.state !== 'running') {
+                            Tone.start();
+                        }
+                    });
+
+                    // Track mouse for card glow effect
+                    window.addEventListener('mousemove', (e) => {
+                        document.querySelectorAll('.cyber-card').forEach(card => {
+                            const rect = card.getBoundingClientRect();
+                            const x = e.clientX - rect.left;
+                            const y = e.clientY - rect.top;
+                            card.style.setProperty('--mouse-x', `${x}px`);
+                            card.style.setProperty('--mouse-y', `${y}px`);
+                        });
+                    });
+
+                    // Session check
+                    if (this.user) {
+                        this.screen = 'dashboard';
+                        this.syncUserData();
+                        this.startMotivationalCycle();
+                    }
+                },
+
+                startMotivationalCycle() {
+                    setInterval(() => {
+                        this.motivationalText = this.dashboardQuotes[Math.floor(Math.random() * this.dashboardQuotes.length)];
+                    }, 10000);
+                },
+
+                syncUserData() {
+                    if (!this.user) return;
+                    const allUsers = JSON.parse(localStorage.getItem('coderush_users') || '[]');
+                    const userIdx = allUsers.findIndex(u => u.email === this.user.email);
+                    if (userIdx !== -1) {
+                        const current = allUsers[userIdx];
+                        const today = new Date().toDateString();
+                        const yesterday = new Date(Date.now() - 86400000).toDateString();
+                        
+                        // Check if streak should reset (missed more than today and yesterday)
+                        if (current.lastDate && current.lastDate !== today && current.lastDate !== yesterday) {
+                            current.streak = 0;
+                            allUsers[userIdx] = current;
+                            localStorage.setItem('coderush_users', JSON.stringify(allUsers));
+                        }
+
+                        this.totalXP = current.xp;
+                        this.dailyStreak = current.streak;
+                        this.history = current.history || [];
+                    }
+                },
+
+                handleAuth() {
+                    // Initialize Audio Context on first interaction
+                    Tone.start().then(() => {
+                        console.log("Neural Audio Link Established");
+                    });
+                    
+                    this.authError = '';
+                    const allUsers = JSON.parse(localStorage.getItem('coderush_users') || '[]');
+
+                    if (this.authMode === 'signup') {
+                        if (!this.authForm.name || !this.authForm.email || !this.authForm.password) {
+                            this.authError = 'All neural links must be established (fill all fields).';
+                            return;
+                        }
+                        if (allUsers.some(u => u.email === this.authForm.email)) {
+                            this.authError = 'Agent already exists in database.';
+                            return;
+                        }
+
+                        const newUser = {
+                            id: Math.random().toString(36).substr(2, 6).toUpperCase(),
+                            name: this.authForm.name,
+                            email: this.authForm.email,
+                            password: this.authForm.password,
+                            xp: 0,
+                            streak: 0,
+                            lastDate: null
+                        };
+                        allUsers.push(newUser);
+                        localStorage.setItem('coderush_users', JSON.stringify(allUsers));
+                        this.loginUser(newUser);
+                    } else {
+                        const user = allUsers.find(u => u.email === this.authForm.email && u.password === this.authForm.password);
+                        if (!user) {
+                            this.authError = 'Invalid credentials. Access denied.';
+                            return;
+                        }
+                        this.loginUser(user);
+                    }
+                },
+
+                loginUser(user) {
+                    const sessionData = { id: user.id, name: user.name, email: user.email };
+                    this.user = sessionData;
+                    localStorage.setItem('coderush_session', JSON.stringify(sessionData));
+                    this.syncUserData();
+                    this.screen = 'dashboard';
+                },
+
+                logout() {
+                    localStorage.removeItem('coderush_session');
+                    this.user = null;
+                    this.screen = 'auth';
+                    this.authForm = { name: '', email: '', password: '' };
+                },
+
+                initCanvasParticles() {
+                    const canvas = document.getElementById('particleCanvas');
+                    const ctx = canvas.getContext('2d');
+                    this.resizeCanvas();
+
+                    const particles = [];
+                    for(let i=0; i<100; i++) {
+                        particles.push({
+                            x: Math.random() * canvas.width,
+                            y: Math.random() * canvas.height,
+                            size: Math.random() * 2 + 1,
+                            speedX: (Math.random() - 0.5) * 0.5,
+                            speedY: (Math.random() - 0.5) * 0.5,
+                            color: Math.random() > 0.5 ? '#00f2ff' : '#7000ff'
+                        });
+                    }
+
+                    const animate = () => {
+                        ctx.clearRect(0, 0, canvas.width, canvas.height);
+                        // Increase speed when in game screen or focus mode
+                        let speedMult = this.screen === 'game' ? (this.timeLeft < 10 ? 4 : 2) : 1;
+                        if (this.config.focusMode && this.screen === 'game') speedMult *= 1.5;
+                        
+                        particles.forEach(p => {
+                            p.x += p.speedX * speedMult;
+                            p.y += p.speedY * speedMult;
+
+                            if (p.x < 0 || p.x > canvas.width) p.speedX *= -1;
+                            if (p.y < 0 || p.y > canvas.height) p.speedY *= -1;
+
+                            ctx.beginPath();
+                            ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+                            ctx.fillStyle = p.color;
+                            ctx.shadowBlur = (this.screen === 'game' && this.config.focusMode) ? 25 : (this.screen === 'game' ? 15 : 5);
+                            ctx.shadowColor = p.color;
+                            ctx.fill();
+                            ctx.shadowBlur = 0; // Reset for lines
+
+                            // Lines
+                            particles.forEach(p2 => {
+                                const dist = Math.hypot(p.x - p2.x, p.y - p2.y);
+                                if (dist < 100) {
+                                    ctx.strokeStyle = p.color;
+                                    ctx.globalAlpha = (1 - (dist / 100)) * (this.screen === 'game' ? (this.config.focusMode ? 0.6 : 0.4) : 0.2);
+                                    ctx.lineWidth = 0.5;
+                                    ctx.beginPath();
+                                    ctx.moveTo(p.x, p.y);
+                                    ctx.lineTo(p2.x, p2.y);
+                                    ctx.stroke();
+                                    ctx.globalAlpha = 1;
+                                }
+                            });
+                        });
+                        requestAnimationFrame(animate);
+                    };
+                    animate();
+                },
+
+                resizeCanvas() {
+                    const canvas = document.getElementById('particleCanvas');
+                    canvas.width = window.innerWidth;
+                    canvas.height = window.innerHeight;
+                },
+
+                toggleMute() {
+                    this.isMuted = !this.isMuted;
+                    localStorage.setItem('coderush_muted', this.isMuted);
+                    Tone.Destination.mute = this.isMuted;
+                    
+                    // Mute HTML5 elements
+                    const audios = ['clickSound', 'bgMusic', 'intenseMusic', 'successSound', 'errorSound'];
+                    audios.forEach(id => {
+                        const el = document.getElementById(id);
+                        if (el) el.muted = this.isMuted;
+                    });
+                },
+
+                initAudio() {
+                    // Master volume control
+                    Tone.Destination.mute = this.isMuted;
+
+                    // Procedural Synths for dynamic layering
+                    this.urgencySynth = new Tone.FMSynth({
+                        harmonicity: 3,
+                        modulationIndex: 10,
+                        oscillator: { type: "sine" },
+                        envelope: { attack: 0.01, decay: 0.1, sustain: 0.1, release: 0.1 }
+                    }).toDestination();
+                    this.urgencySynth.volume.value = -25;
+
+                    this.droneSynth = new Tone.MonoSynth({
+                        oscillator: { type: "sawtooth" },
+                        filter: { Q: 2, type: "lowpass", rolloff: -24 },
+                        envelope: { attack: 0.5, release: 2 }
+                    }).toDestination();
+                    this.droneSynth.volume.value = -30;
+                    
+                    this.uiSynth = new Tone.MonoSynth({
+                        oscillator: { type: "square" },
+                        envelope: { attack: 0.01, release: 0.1 }
+                    }).toDestination();
+                    this.uiSynth.volume.value = -15;
+
+                    // Set initial mute state for HTML5 elements
+                    const audios = ['clickSound', 'bgMusic', 'intenseMusic', 'successSound', 'errorSound'];
+                    audios.forEach(id => {
+                        const el = document.getElementById(id);
+                        if (el) el.muted = this.isMuted;
+                    });
+
+                    this.isAudioReady = true;
+                    console.log("Neural Audio Link Ready");
+                },
+
+                startTraining() {
+                    // CRITICAL: Start Audio Context on user interaction
+                    Tone.start().then(() => {
+                        console.log("Neural Audio Link Established");
+                    });
+                    
+                    this.isDailyChallenge = false;
+                    this.applyDifficultySettings();
+
+                    // Randomize questions for this session
+                    const allQuestions = [...this.questions[this.config.language]];
+                    this.sessionQuestions = allQuestions
+                        .sort(() => Math.random() - 0.5)
+                        .slice(0, this.config.target);
+
+                    if (document.documentElement.requestFullscreen) {
+                        document.documentElement.requestFullscreen().catch(() => {});
+                    }
+                    
+                    this.screen = 'game';
+                    this.currentIdx = 0;
+                    this.score = 0;
+                    this.streak = 0;
+                    this.maxStreak = 0;
+                    this.stats.solved = 0;
+                    this.currentSessionHistory = [];
+                    this.loadQuestion();
+                    
+                    // Start the game loop sounds (Click sound is handled by global listener)
+                    setTimeout(() => {
+                        this.startBackgroundMusic();
+                    }, 1000);
+                },
+
+                playClick() {
+                    const click = document.getElementById("clickSound");
+                    if (click) {
+                        click.currentTime = 0;
+                        click.play().catch(e => console.log("Click sound blocked", e));
+                    }
+                },
+
+                startBackgroundMusic() {
+                    const music = document.getElementById("bgMusic");
+                    const intense = document.getElementById("intenseMusic");
+                    
+                    // Reset both
+                    if (music) { music.pause(); music.currentTime = 0; music.volume = 0.5; }
+                    if (intense) { intense.pause(); intense.currentTime = 0; intense.volume = 0.5; }
+
+                    if (music) {
+                        music.play().catch(err => console.log("Music blocked:", err));
+                    }
+
+                    // Always add the procedural bass layer for intensity (synths are reliable)
+                    Tone.Transport.cancel();
+                    
+                    const bassLoop = new Tone.Loop(time => {
+                        this.uiSynth.triggerAttackRelease("C1", "8n", time, 0.1);
+                    }, "2n").start(0);
+
+                    // Focus Mode: Drone Layer
+                    if (this.config.focusMode) {
+                        this.droneSynth.triggerAttack("C1");
+                    }
+
+                    // Start Transport
+                    Tone.Transport.start();
+                },
+
+                stopBackgroundMusic() {
+                    const music = document.getElementById("bgMusic");
+                    const intense = document.getElementById("intenseMusic");
+                    if (music) {
+                        music.pause();
+                        music.currentTime = 0;
+                    }
+                    if (intense) {
+                        intense.pause();
+                        intense.currentTime = 0;
+                    }
+                    if (this.droneSynth) this.droneSynth.triggerRelease();
+                    Tone.Transport.stop();
+                    Tone.Transport.cancel();
+                },
+
+                initializeMultiplayer() {
+                    // Reset Multiplayer Session
+                    this.isMultiplayer = true;
+                    this.player1 = { 
+                        name: this.multiplayerConfig.player1Name || this.user?.name || 'Player 1', 
+                        score: 0 
+                    };
+                    this.player2 = { 
+                        name: this.multiplayerConfig.player2Name || 'Player 2', 
+                        score: 0 
+                    };
+                    this.activePlayer = 1;
+                    this.multiplayerWinner = null;
+                    
+                    this.startTraining();
+                },
+
+                startDailyChallenge() {
+                    this.isDailyChallenge = true;
+                    this.config.target = 3;
+                    this.config.difficulty = 'Master';
+                    this.config.focusMode = true;
+                    this.startTraining();
+                },
+
+                applyDifficultySettings() {
+                    const settings = {
+                        'Beginner': { time: 3, multiplier: 1 },
+                        'Pro': { time: 1.5, multiplier: 2 },
+                        'Master': { time: 0.75, multiplier: 5 }
+                    };
+                    const s = settings[this.config.difficulty];
+                    this.config.timePerQuestion = s.time;
+                },
+
+                calculateXP() {
+                    const diffMult = { 'Beginner': 1, 'Pro': 2, 'Master': 5 }[this.config.difficulty];
+                    const dailyMult = this.isDailyChallenge ? 2 : 1;
+                    return Math.round(this.score * diffMult * dailyMult * 0.1);
+                },
+
+                loadQuestion() {
+                    this.currentQuestion = this.sessionQuestions[this.currentIdx];
+                    this.timeLeft = this.config.timePerQuestion * 60;
+                    this.userInput = '';
+                    this.feedbackEffect = null;
+                    this.startTimer();
+                },
+
+                startTimer() {
+                    if(this.timerId) clearInterval(this.timerId);
+                    this.timerId = setInterval(() => {
+                        this.timeLeft--;
+                        
+                        // Dynamic Music Intensity
+                        const music = document.getElementById("bgMusic");
+                        const intense = document.getElementById("intenseMusic");
+
+                        if(this.timeLeft === 10) {
+                            // Switch to intense music
+                            if (music) music.pause();
+                            if (intense) intense.play().catch(e => console.log("Intense music blocked", e));
+                        }
+
+                        if(this.timeLeft < 10) {
+                            // High-pitched tension heart-beat
+                            if (this.timeLeft % 1 === 0) {
+                                this.urgencySynth.triggerAttackRelease("C6", "32n");
+                                this.uiSynth.triggerAttackRelease("C2", "16n", undefined, 0.2);
+                            }
+                            // Increase BPM and Volume for perceived urgency
+                            Tone.Transport.bpm.rampTo(160, 1);
+                            if (intense) intense.volume = 0.8;
+                        } else if (this.timeLeft < 20) {
+                            // Mid-level urgency layer
+                            if (this.timeLeft % 2 === 0) {
+                                this.urgencySynth.triggerAttackRelease("G4", "16n");
+                            }
+                            Tone.Transport.bpm.rampTo(130, 1);
+                            if (music) music.volume = 0.6;
+                        } else {
+                            Tone.Transport.bpm.rampTo(120, 1);
+                            if (music) music.volume = 0.5;
+                        }
+
+                        if(this.timeLeft <= 0) {
+                            this.handleFailure();
+                        }
+                    }, 1000);
+                },
+
+                formatTime(seconds) {
+                    const m = Math.floor(seconds / 60);
+                    const s = seconds % 60;
+                    return `${m}:${s < 10 ? '0' : ''}${s}`;
+                },
+
+                submitSolution() {
+                    const q = this.currentQuestion;
+                    let isCorrect = false;
+
+                    if (q.type === 'coding' || q.type === 'debug') {
+                        // Simple check for coding/debug: must contain at least part of the answer
+                        const firstWord = q.answer.split(' ')[0];
+                        isCorrect = this.userInput.includes(firstWord) && this.userInput.length > 5;
+                    } else if (q.type === 'predict' || q.type === 'mcq' || q.type === 'fill') {
+                        // Exact match for MCQ, Prediction, and Fill in the blanks (case insensitive for text)
+                        isCorrect = this.userInput.trim().toLowerCase() === q.answer.trim().toLowerCase();
+                    }
+                    
+                    if(isCorrect) {
+                        this.handleSuccess();
+                    } else {
+                        this.handleFailure();
+                    }
+                },
+
+                handleSuccess() {
+                    clearInterval(this.timerId);
+                    this.feedbackEffect = 'correct';
+                    
+                    const success = document.getElementById("successSound");
+                    if (success) {
+                        success.currentTime = 0;
+                        success.play().catch(e => console.log("Success sound blocked", e));
+                    }
+
+                    confetti({
+                        particleCount: 100,
+                        spread: 70,
+                        origin: { y: 0.6 },
+                        colors: ['#00f2ff', '#7000ff', '#ffffff']
+                    });
+                    
+                    // Track this success in current session history
+                    this.currentSessionHistory.push({
+                        qid: this.currentQuestion.title,
+                        correct: true,
+                        time: (this.config.timePerQuestion * 60) - this.timeLeft,
+                        date: new Date().toISOString()
+                    });
+
+                    const diffMult = { 'Beginner': 1, 'Pro': 1.5, 'Master': 2.5 }[this.config.difficulty];
+                    const points = Math.round(this.timeLeft * (1 + this.streak * 0.2) * diffMult);
+                    this.score += points;
+                    
+                    if (this.isMultiplayer) {
+                        if (this.activePlayer === 1) this.player1.score += points;
+                        else this.player2.score += points;
+                    }
+
+                    this.streak++;
+                    if (this.streak > this.maxStreak) this.maxStreak = this.streak;
+                    this.stats.solved++;
+                    
+                    setTimeout(() => {
+                        this.feedbackEffect = null;
+                        this.nextQuestion();
+                    }, 1500);
+                },
+
+                handleFailure() {
+                    clearInterval(this.timerId);
+                    this.feedbackEffect = 'wrong';
+
+                    const error = document.getElementById("errorSound");
+                    if (error) {
+                        error.currentTime = 0;
+                        error.play().catch(e => console.log("Error sound blocked", e));
+                    }
+
+                    // Track this failure in current session history
+                    this.currentSessionHistory.push({
+                        qid: this.currentQuestion?.title || 'Unknown',
+                        correct: false,
+                        time: (this.config.timePerQuestion * 60) - this.timeLeft,
+                        date: new Date().toISOString()
+                    });
+
+                    this.streak = 0;
+                    
+                    setTimeout(() => {
+                        this.feedbackEffect = null;
+                        this.nextQuestion();
+                    }, 2500); // Longer delay to show correct answer
+                },
+
+                nextQuestion() {
+                    this.currentIdx++;
+                    if(this.currentIdx >= this.config.target) {
+                        if (this.isMultiplayer && this.activePlayer === 1) {
+                            // Switch to Player 2
+                            this.activePlayer = 2;
+                            this.currentIdx = 0;
+                            this.streak = 0;
+                            this.maxStreak = 0;
+                            this.loadQuestion();
+                        } else {
+                            this.endGame();
+                        }
+                    } else {
+                        this.loadQuestion();
+                    }
+                },
+
+                endGame() {
+                    clearInterval(this.timerId);
+                    this.stopBackgroundMusic();
+
+                    if (this.isMultiplayer) {
+                        if (this.player1.score > this.player2.score) this.multiplayerWinner = this.player1.name;
+                        else if (this.player2.score > this.player1.score) this.multiplayerWinner = this.player2.name;
+                        else this.multiplayerWinner = 'STALEMATE';
+                        this.screen = 'result';
+                        return;
+                    }
+                    
+                    // Update User Store
+                    const allUsers = JSON.parse(localStorage.getItem('coderush_users') || '[]');
+                    const userIdx = allUsers.findIndex(u => u.email === this.user.email);
+                    
+                    if (userIdx !== -1 && this.stats.solved > 0) {
+                        const earnedXP = this.calculateXP();
+                        this.totalXP += earnedXP;
+                        allUsers[userIdx].xp = this.totalXP;
+                        
+                        // History Update
+                        if (!allUsers[userIdx].history) allUsers[userIdx].history = [];
+                        allUsers[userIdx].history.push(...this.currentSessionHistory);
+                        this.history = allUsers[userIdx].history;
+
+                        // Daily Streak Update (only if at least 1 solved)
+                        const today = new Date().toDateString();
+                        const yesterday = new Date(Date.now() - 86400000).toDateString();
+                        
+                        if (allUsers[userIdx].lastDate !== today) {
+                            if (allUsers[userIdx].lastDate === yesterday) {
+                                allUsers[userIdx].streak++;
+                            } else {
+                                allUsers[userIdx].streak = 1;
+                            }
+                            allUsers[userIdx].lastDate = today;
+                            this.dailyStreak = allUsers[userIdx].streak;
+                        }
+                        
+                        localStorage.setItem('coderush_users', JSON.stringify(allUsers));
+                    }
+
+                    // Mock Beat Percentage
+                    this.stats.beatPercentage = Math.floor(Math.random() * 15) + 1;
+                    this.screen = 'result';
+                },
+
+                resetGame() {
+                    clearInterval(this.timerId);
+                    this.stopBackgroundMusic();
+                    this.isMultiplayer = false;
+                    this.screen = 'dashboard';
+                },
+
+                async sendChatMessage() {
+                    if (!this.chatInput.trim()) return;
+                    
+                    const userMsg = this.chatInput.trim();
+                    this.chatHistory.push({ role: 'user', content: userMsg });
+                    this.chatInput = '';
+                    this.isChatTyping = true;
+
+                    // Scroll to bottom after message
+                    this.scrollChatToBottom();
+
+                    try {
+                        // AI API CONNECTION POINT
+                        // Note: Replace with your actual endpoint (e.g. OpenAI, Gemini, or local proxy)
+                        // For this demo, we simulate an API call with a real fetch to a placeholder 
+                        // if available, otherwise we use the enhanced mock logic.
+                        
+                        let responseText = "";
+                        const apiAvailable = false; // Toggle this when you have a real endpoint
+
+                        if (apiAvailable) {
+                            const response = await fetch('https://api.coderush.io/v1/chat', {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({ message: userMsg })
+                            });
+                            const data = await response.json();
+                            responseText = data.reply;
+                        } else {
+                            // Enhanced Mock Logic (Simulated Neural Processing)
+                            await new Promise(resolve => setTimeout(resolve, 1500));
+                            
+                            responseText = "I've analyzed your neural query. ";
+                            if (userMsg.toLowerCase().includes('loop')) {
+                                responseText += "Loops are repetition protocols. In Python, 'for' shuffles through sequences, while 'while' executes as long as a boolean condition remains True.";
+                            } else if (userMsg.toLowerCase().includes('array') || userMsg.toLowerCase().includes('list')) {
+                                responseText += "Arrays/Lists are indexed storage modules. Remember that indexing starts at 0, and accessing an out-of-bounds index will trigger a system exception.";
+                            } else if (userMsg.toLowerCase().includes('function')) {
+                                responseText += "Functions are reusable logic blocks. Use the 'def' keyword to define them and 'return' to pass data back to the primary thread.";
+                            } else {
+                                responseText += "To optimize your code, ensure you are maintaining clean syntax and following the DRY (Don't Repeat Yourself) principle.";
+                            }
+                        }
+
+                        this.chatHistory.push({ role: 'ai', content: responseText });
+                    } catch (error) {
+                        console.error("Neural Link Error:", error);
+                        this.chatHistory.push({ role: 'ai', content: "SYSTEM_ERROR: Neural link unstable. Reverting to local backup... Please try your query again." });
+                    } finally {
+                        this.isChatTyping = false;
+                        this.scrollChatToBottom();
+                    }
+                },
+
+                scrollChatToBottom() {
+                    setTimeout(() => {
+                        const chatContainer = document.getElementById('chatContainer');
+                        if (chatContainer) chatContainer.scrollTop = chatContainer.scrollHeight;
+                    }, 50);
+                },
+
+                async generateSimilarQuestion() {
+                    this.isChatTyping = true;
+                    this.chatHistory.push({ role: 'user', content: 'Generate a practice mission for me.' });
+                    this.scrollChatToBottom();
+
+                    // Simulate API delay
+                    await new Promise(resolve => setTimeout(resolve, 1500));
+
+                    const q = this.questions.python[Math.floor(Math.random() * this.questions.python.length)];
+                    
+                    let response = `NEURAL MISSION GENERATED: [${q.title}]\n\nTask: ${q.description}\n\nType 'Start Practice' to begin this specific link.`;
+                    
+                    this.chatHistory.push({ role: 'ai', content: response });
+                    this.isChatTyping = false;
+                    this.scrollChatToBottom();
+                },
+
+                getDailySolved() {
+                    const today = new Date().toDateString();
+                    return this.history.filter(h => new Date(h.date).toDateString() === today && h.correct).length;
+                },
+
+                getOverallStats() {
+                    if (!this.history || this.history.length === 0) {
+                        return { totalSolved: 0, accuracy: 0, avgTime: 0 };
+                    }
+                    const total = this.history.length;
+                    const correct = this.history.filter(h => h.correct).length;
+                    const accuracy = Math.round((correct / total) * 100);
+                    const avgTime = Math.round(this.history.reduce((acc, curr) => acc + curr.time, 0) / total);
+                    return { totalSolved: correct, accuracy, avgTime };
+                },
+
+                getActivityData() {
+                    // Group history by date for the last 7 days
+                    const data = [];
+                    const today = new Date();
+                    for (let i = 6; i >= 0; i--) {
+                        const date = new Date(today);
+                        date.setDate(date.getDate() - i);
+                        const dateStr = date.toDateString();
+                        const count = this.history.filter(h => new Date(h.date).toDateString() === dateStr && h.correct).length;
+                        data.push({ date: date.toLocaleDateString('en-US', { weekday: 'short' }), count });
+                    }
+                    return data;
+                },
+
+                getMotivationalMessage() {
+                    const ratio = this.stats.solved / this.config.target;
+                    if(ratio === 1) return "ABSOLUTE LEGEND. YOU ARE THE CODE MASTER.";
+                    if(ratio > 0.5) return "GREAT PERFORMANCE. KEEP PUSHING THE LIMITS.";
+                    return "TRAINING IS TOUGH. COME BACK STRONGER.";
+                }
+            }
+        }
+    </script>
+</body>
+</html>
