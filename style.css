@@ -1,0 +1,198 @@
+/* Main Dashboard Styles */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f5f5f5;
+}
+
+.navbar-brand {
+    font-weight: bold;
+}
+
+.card {
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
+    border-radius: 8px;
+    border: none;
+}
+
+.card-header {
+    background-color: #f8f9fa;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.125);
+    font-weight: 600;
+    padding: 12px 20px;
+    border-radius: 8px 8px 0 0;
+}
+
+/* Statistics Styling */
+.stat-item {
+    background-color: #ffffff;
+    border-radius: 6px;
+    padding: 10px 15px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.stat-label {
+    font-size: 0.9rem;
+    color: #6c757d;
+    margin-bottom: 5px;
+}
+
+.stat-value {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #343a40;
+}
+
+/* Traffic Light Controls */
+.traffic-light {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    margin-right: 5px;
+}
+
+.traffic-light.red {
+    background-color: #dc3545;
+}
+
+.traffic-light.yellow {
+    background-color: #ffc107;
+}
+
+.traffic-light.green {
+    background-color: #28a745;
+}
+
+/* Traffic Map Styling */
+#trafficMap {
+    background-color: #e9ecef;
+    border-radius: 6px;
+}
+
+.intersection {
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    background-color: #6c757d;
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.road {
+    position: absolute;
+    background-color: #343a40;
+    transform-origin: 0 0;
+}
+
+.road.horizontal {
+    height: 10px;
+}
+
+.road.vertical {
+    width: 10px;
+}
+
+.vehicle {
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.vehicle.car {
+    background-color: #007bff;
+}
+
+.vehicle.emergency {
+    background-color: #dc3545;
+}
+
+.vehicle.public_transport {
+    background-color: #28a745;
+}
+
+/* Congestion Indicators */
+.congestion-low {
+    background-color: #28a745;
+}
+
+.congestion-medium {
+    background-color: #ffc107;
+}
+
+.congestion-high {
+    background-color: #dc3545;
+}
+
+/* Improvement Highlight */
+#improvementRow {
+    display: none;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .stat-value {
+        font-size: 1.2rem;
+    }
+    
+    #trafficMap {
+        height: 300px !important;
+    }
+    
+    .card-body {
+        padding: 15px;
+    }
+}
+
+/* Animation for loading */
+@keyframes pulse {
+    0% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.5;
+    }
+    100% {
+        opacity: 1;
+    }
+}
+
+.loading {
+    animation: pulse 1.5s infinite;
+}
+
+/* Tooltip styling */
+.tooltip-inner {
+    max-width: 200px;
+    padding: 8px 12px;
+    color: #fff;
+    text-align: center;
+    background-color: #000;
+    border-radius: 4px;
+}
+
+/* Custom toggle switch */
+.form-check-input:checked {
+    background-color: #28a745;
+    border-color: #28a745;
+}
+
+/* Table styling */
+.table-striped tbody tr:nth-of-type(odd) {
+    background-color: rgba(0, 0, 0, 0.02);
+}
+
+.table th {
+    border-top: none;
+    font-weight: 600;
+    color: #495057;
+}
+
+/* Chart containers */
+#travelTimeChart, #congestionChart, #comparisonChart {
+    background-color: #ffffff;
+    border-radius: 6px;
+    box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.05);
+}
